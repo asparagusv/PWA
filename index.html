@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Simple PWA Demo</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1e90ff"/>
+  <style>
+    :root{--bg:#f4f7fb;--accent:#1e90ff}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;margin:0;background:var(--bg);color:#111}
+    header{background:var(--accent);color:white;padding:1rem;text-align:center}
+    main{padding:1.25rem;max-width:720px;margin:0 auto}
+    .btn{display:inline-block;margin-top:1rem;padding:.6rem 1rem;border-radius:8px;background:white;color:var(--accent);text-decoration:none;font-weight:600}
+  </style>
+</head>
+<body>
+  <header><h1>Simple PWA Demo</h1></header>
+  <main>
+    <p>This is a minimal PWA-ready project. It includes a web manifest and a service worker that caches assets for offline use.</p>
+    <p>Try installing it on your device: in Safari on iPhone tap the Share button → "Add to Home Screen".</p>
+    <a class="btn" id="installBtn">Install / Check</a>
+  </main>
+  <script>
+    // register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js').then(() => console.log('SW registered'));
+    }
+
+    // Basic install prompt handling (for browsers that support it)
+    let deferredPrompt;
+    const btn = document.getElementById('installBtn');
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      btn.textContent = 'Install app';
+    });
+    btn.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const choice = await deferredPrompt.userChoice;
+        console.log('Choice', choice);
+        deferredPrompt = null;
+      } else {
+        alert('On iPhone Safari: use Share → Add to Home Screen to install.');
+      }
+    });
+  </script>
+</body>
+</html>
